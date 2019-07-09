@@ -1,8 +1,6 @@
 const fs = require("fs");
 const NodeID3 = require("node-id3");
-
-const tempFolder = "./Temp";
-const directories = ["Pic", "File"];
+const { execSync } = require("child_process");
 
 fs.readdir("./", function(err, files) {
   if (err) throw err;
@@ -12,10 +10,8 @@ fs.readdir("./", function(err, files) {
       return file.match(/\.(zip|rar)$/g);
     })
     .forEach(function(file) {
-      directories.forEach(dir => {
-        const path = "./" + file + "/" + dir;
-        if (!fs.existsSync(path)) fs.mkdirSync(path);
-      });
+      execSync(`mkdir musics`);
+      execSync(`rar e ${file} musics`);
 
       let tags = NodeID3.read("./music.mp3");
 

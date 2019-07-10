@@ -10,13 +10,9 @@ fs.readdir("./", function (err, files) {
       return file.match(/\.zip$/g);
     })
     .forEach(function (file) {
-      const directory = file.replace('.zip', '');
-      if (fs.existsSync(directory))
-        execSync(`rm -rf "${directory}"`);
-
-      execSync(`unzip "${file}"`);
-
-      fs.readdir(directory, function (err, musics) {
+      extractMusic(file);
+      
+      fs.readdir('./musics', function (err, musics) {
         if (err) throw err;
 
         musics
@@ -24,14 +20,26 @@ fs.readdir("./", function (err, files) {
             return music.match(/\.mp3$/g);
           })
           .forEach(function (music) {
-            let tags = NodeID3.read(`./${directory}/${music}`);
-
-            tags.copyright = "Gerama.ir";
-            tags.comment.text = "Gerama.ir";
-            tags.image.description = "Gerama.ir";
-
-            NodeID3.update(tags, `./${directory}/${music}`);
+            editMusicTags(music);
           });
       });
     });
 });
+
+function extractMusic(file) {
+  const directory = file.replace('.zip', '');
+  if (fs.existsSync(directory))
+    execSync(`rm -rf "${directory}"`);
+  execSync(`unzip "${file}"`);
+  if (fs.existsSync('./musics'))
+    execSync(`rm -rf musics`);
+  execSync(`mv "${directory}" musics`);
+}
+
+function editMusicTags(music) {
+  let tags = NodeID3.read(`./musics/${music}`);
+  tags.copyright = "Gerama.ir";
+  tags.comment.text = "Gerama.ir";
+  tags.image.description = "Gerama.ir";
+  NodeID3.update(tags, `./musics/${music}`);
+}

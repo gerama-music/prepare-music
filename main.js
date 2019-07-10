@@ -7,13 +7,16 @@ fs.readdir("./", function (err, files) {
 
   files
     .filter(function (file) {
-      return file.match(/\.(zip|rar)$/g);
+      return file.match(/\.zip$/g);
     })
     .forEach(function (file) {
-      execSync(`mkdir musics`);
-      execSync(`rar e ${file} musics`);
+      const directory = file.replace('.zip', '');
+      if (fs.existsSync(directory))
+        execSync(`rm -rf "${directory}"`);
 
-      fs.readdir("./musics", function (err, musics) {
+      execSync(`unzip "${file}"`);
+
+      fs.readdir(directory, function (err, musics) {
         if (err) throw err;
 
         musics
@@ -21,13 +24,13 @@ fs.readdir("./", function (err, files) {
             return music.match(/\.mp3$/g);
           })
           .forEach(function (music) {
-            let tags = NodeID3.read(`./music/${music}`);
+            let tags = NodeID3.read(`./${directory}/${music}`);
 
             tags.copyright = "Gerama.ir";
             tags.comment.text = "Gerama.ir";
             tags.image.description = "Gerama.ir";
 
-            NodeID3.update(tags, `./music/${music}`);
+            NodeID3.update(tags, `./${directory}/${music}`);
           });
       });
     });

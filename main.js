@@ -1,6 +1,8 @@
 const fs = require("fs");
 const NodeID3 = require("node-id3");
-const { execSync } = require("child_process");
+const {
+  execSync
+} = require("child_process");
 
 fs.readdir("./", function (err, files) {
   if (err) throw err;
@@ -11,7 +13,7 @@ fs.readdir("./", function (err, files) {
     })
     .forEach(function (file) {
       extractMusic(file);
-      
+
       fs.readdir('./musics', function (err, musics) {
         if (err) throw err;
 
@@ -23,6 +25,18 @@ fs.readdir("./", function (err, files) {
             editMusicTags(music);
           });
       });
+    });
+});
+
+fs.readdir("./download", function (err, composers) {
+  if (err) throw err;
+
+  composers
+    .filter(function (composer) {
+      return fs.statSync(composer).isDirectory();
+    })
+    .forEach(function (composer) {
+
     });
 });
 
